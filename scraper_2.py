@@ -51,24 +51,44 @@ class Scraper:
 
     def get_loc_capacity_price_name(self):
         venue_basics = self.driver.find_element(by=By.XPATH, value='//div[@class="venue-basics"]')
-        venue_items = venue_basics.find_element(by=By.XPATH, value='./div')
+        venue_items = venue_basics.find_elements(by=By.XPATH, value='./div')
         items=[]
         for item in venue_items:
             items.append(item.text)
+        # print(items)
 
     def get_description(self):
-        description_section = self.drive.find_element(by=By.XPATH, value='//section[@id="description"]')
-        description_section.text
-
-    def get_facility(self):
-        pass
+        description_section = self.driver.find_element(by=By.XPATH, value='//section[@id="description"]')
+        # print(description_section.text)
 
     def get_additional_info(self):
-        venue_features = self.drive.find_element(by=By.XPATH, value='//section[@id"venue-features"]')
-        venue_features.text
+        venue_features = self.driver.find_element(by=By.XPATH, value='//section[@class="venue-features"]')
+        # print(venue_features.text)
+    
+    def get_images(self):
+        images_venue_section = self.driver.find_element(by=By.XPATH, value='//ul[@id="photo-gallery"]')
+        images = images_venue_section.find_elements(by=By.XPATH, value='.//img')
+        images_list = []
+        for image in images:
+            images_list.append(image.get_attribute('src'))
+        print(images_list)
+
+
+    def open_venue_page(self, link):
+        self.driver.get(link)
+    
+    def extract_data(self):
+        for link in self.links:
+            self.open_venue_page(link)
+            self.get_description()
+            self.get_loc_capacity_price_name()
+            self.get_additional_info()
+            self.get_images()
 
 if __name__ == "__main__":
     wedding = Scraper("https://www.frenchweddingvenues.com/french-wedding-venues")
     wedding.accept_cookies()
     wedding.specify_search()
     wedding.get_links()
+    wedding.extract_data()
+
