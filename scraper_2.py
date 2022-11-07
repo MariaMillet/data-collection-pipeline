@@ -67,17 +67,8 @@ class Scraper:
         venue_features = self.drive.find_element(by=By.XPATH, value='//section[@id"venue-features"]')
         venue_features.text
 
-wedding = Scraper("https://www.frenchweddingvenues.com/french-wedding-venues")
-wedding.accept_cookies()
-wedding.specify_search()
-# %%
-wedding.get_links()
-# %%
-wedding.links
-# %%
-wedding.driver.find_elements(by=By.XPATH, value='//a[class="cbc-cookie-notice__button cbc-cookie-notice__button--allow"]')
-
-# <a class="cbc-cookie-notice__button cbc-cookie-notice__button--allow">
-						# Allow
-					# </a>
-# %%
+if __name__ == "__main__":
+    wedding = Scraper("https://www.frenchweddingvenues.com/french-wedding-venues")
+    wedding.accept_cookies()
+    wedding.specify_search()
+    wedding.get_links()
