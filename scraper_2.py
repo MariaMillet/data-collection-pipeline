@@ -101,7 +101,7 @@ class Scraper:
     def get_additional_info(self):
         """ Scrap any additional information on the venue under the venue-features"""
         venue_features = self.driver.find_element(by=By.XPATH, value='//section[@class="venue-features"]')
-        return venue_features
+        return venue_features.text
     
     def get_images(self):
         """ Get references for all images depicted on the venue page."""
@@ -128,11 +128,12 @@ class Scraper:
         with open(dirName, 'w') as fp:
             json.dump(data, fp, default=lambda o: '<not serializable>')
 
-    def download_img(self, parent_folder, image_url, id):
+    @staticmethod
+    def download_img(parent_folder, image_url, id):
         """ Downloads an image into a parent folder
         
         Args:
-            parent_folder (str): a parent folder for the image
+            parent_folder (str): a name of the parent folder for the image
             image_url (str): reference of the image
             id (str): unique id for the image
 
@@ -165,7 +166,7 @@ class Scraper:
             self.data.setdefault(id, properties_dict)
             dirName = os.path.join(parentDir, id, 'data.json')
             Scraper.save_json_file(dirName, data=properties_dict)
-            self.download_img(parentDir, self.data[id]['images'][0], id)
+            Scraper.download_img(parentDir, self.data[id]['images'][0], id)
         # self.download_img(self, image_url=self.data['images'][0], id=id)
     
     def main_run(self):
@@ -175,12 +176,7 @@ class Scraper:
         self.specify_search()
         self.create_list_of_website_links()
         self.extract_data()
-
-
-
-
-            
-
+          
 if __name__ == "__main__":
     wedding = Scraper("https://www.frenchweddingvenues.com/french-wedding-venues")
     wedding.main_run()
