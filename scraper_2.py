@@ -12,23 +12,25 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 class Scraper:
     '''
-    This class scrapes data of the wedding venues presented.
+    This class scrapes data across regions in France, which feature wedding venues.
 
     Attributes:
         url (string): the url of the website
         driver: Selenium webdriver
-        links (list): links of all the venues on the website
+        links_venues (list): venues' links
+        links_to_destinations (list): links to regions where venues are located
         data (dict): a dictionary with keys as ids and values as features extracted for each property
+        destinations_indices (dict): mapping from the index of the region (as depicted on the website) to the region name and its url
 
     '''
     def __init__(self, url):
         self.url = url
         self.driver = webdriver.Chrome() 
-        self.links = []
+        self.links_venues = []
         self.links_to_destinations = []
-        time.sleep(5)
         self.data = dict()
         self.destinations_indices = dict()
 
@@ -59,7 +61,7 @@ class Scraper:
         and clicking a "Submit" button.
 
         Args:
-            destination (str): 
+            destination (str): an index of the region (1 to 13) in a string format
 
         """
         self.open_page(self.url)
@@ -71,7 +73,10 @@ class Scraper:
         search_button.click()
         
     def get_all_destinations_urls(self):
-        """
+        """ Extracts names and indices values of elements corresponding to regions.
+
+        Populates destination_indices with integer index values as keys and a name and a url as values. 
+
         """
         
         self.open_page(self.url)
@@ -89,7 +94,21 @@ class Scraper:
 
 
     def create_list_of_website_links_per_destination(self, destination_url=None, destination_value = "8"):
-        """ Create a list of all links to the venues presented on the page."""
+        """ Create a list of all links to the venues presented on the page.
+
+        If the url is supplied then the respective page will be loaded and "destination_value" ignored.
+        If the url is not supplied than the page corresponding to the index of the region will be loaded from the 
+        "Search" panel of the main website.
+        This multi functionality is useful in case one or the other method of page loading stops working.
+        
+        Args:
+            destination_url (str): a url of the webpage corresponding to a certain region
+            destination_value (str): an index of the region (1 to 13) in a string format
+        
+        Returns:
+            links_per_destination (lst): a list of extracted venues
+
+        """
         links_per_destination = []
         if destination_url:
             self.open_page(destination_url)
@@ -108,17 +127,29 @@ class Scraper:
         return links_per_destination
 
     def create_list_of_website_links_all_destinations(self):
+        """ Loops through all possible regions and extracts links to venues. 
+            
+            Links_venues attribute of the class is populated.
+
+        """
         for prop_dict in self.destinations_indices.values():
             try:
                 extracted_links_per_destination = self.create_list_of_website_links_per_destination(prop_dict['url'])
-                self.links.extend(extracted_links_per_destination)
+                self.links_venues.extend(extracted_links_per_destination)
                 print(f"Properties links found for destination {prop_dict['name']}")
             except:
                 print(f"No proprties links found for destination {prop_dict['name']}")
 
 
     def get_loc_capacity_price_name(self):
-        """ Scrap an individual page for a name, location, number of guests, capacity, price."""
+        """ Scrap an individual page for a name, location, number of guests, capacity, price.
+            Assumes that the currently loaded page is that of a particular venue.
+
+            Returns:
+                items_dict (dict): "location / guests / sleeps / from" values are populated as well as 
+                                    any further "misc" items
+
+        """
         venue_basics = self.driver.find_element(by=By.XPATH, value='//div[@class="venue-basics"]')
         venue_name = venue_basics.find_element(by=By.XPATH, value='.//span')
         items_dict = {'name': venue_name.text}
@@ -144,7 +175,7 @@ class Scraper:
         return venue_features.text
     
     def get_images(self):
-        """ Get references for all images depicted on the venue page."""
+        """ Get references in a list format for all images depicted on the venue page."""
         images_venue_section = self.driver.find_element(by=By.XPATH, value='//ul[@id="photo-gallery"]')
         images = images_venue_section.find_elements(by=By.XPATH, value='.//img')
         images_list = []
@@ -184,15 +215,15 @@ class Scraper:
             handler.write(img_data)
 
     def extract_data(self):
-        """ Scrap all venues extracted.
+        """ Scraps information for all venues.
 
-            Extract features for each venue saved in the links attribute using previously defined methods. 
+            Extract features for each venue saved in the links_venues attribute using previously defined methods. 
             Save all results in the "raw_data" folder.
 
         """
         parentDir = 'raw_data'
         Scraper.create_folder(parentDir)
-        for link in self.links:
+        for link in self.links_venues:
             self.open_page(link)
             id = str(uuid4())
             Scraper.create_folder(dirName=os.path.join(parentDir , id))
