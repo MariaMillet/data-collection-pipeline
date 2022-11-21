@@ -12,6 +12,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 class Scraper:
     '''
@@ -28,7 +29,9 @@ class Scraper:
     '''
     def __init__(self, url):
         self.url = url
-        self.driver = webdriver.Chrome() 
+        options = Options()
+        options.headless = True
+        self.driver = webdriver.Chrome(options=options) 
         self.links_venues = []
         self.links_to_destinations = []
         self.data = dict()
