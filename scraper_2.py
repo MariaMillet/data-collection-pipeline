@@ -27,8 +27,10 @@ class Scraper:
         self.url = url
         self.driver = webdriver.Chrome() 
         self.links = []
+        self.links_to_destinations = []
         time.sleep(5)
         self.data = dict()
+        self.destinations_indices = dict()
 
     
     def accept_cookies(self):
@@ -49,24 +51,51 @@ class Scraper:
         """ Launches a new browser and opens the given link in the browser instance."""
         self.driver.get(link)
 
-    def specify_search(self, destination="Brittany"):
-        """ Fill in the destination for the venue and start the search.
+    def __specify_search(self, destination_value="8"):
+        """ Fill in the destination value for the venue and start the search.
+
+        The function may be used in case the format of the links to the destinations is amended by a website. 
+        In such a case the user will still be able to navigate to a specific destination by selecting Regions
+        and clicking a "Submit" button.
 
         Args:
             destination (str): 
 
         """
+        self.open_page(self.url)
         destination_field = Select(self.driver.find_element(by=By.XPATH,value='//select[@name="regions"]'))
-        destination_field.select_by_value("8")
+        destination_field.select_by_value(destination_value)
         # time for the search to load
         time.sleep(5)
         search_button = self.driver.find_element(by=By.XPATH, value='//button[@type="submit"]' )
         search_button.click()
         
+    def get_all_destinations_urls(self):
+        """
+        """
         
-    def create_list_of_website_links(self):
+        self.open_page(self.url)
+        self.accept_cookies()
+        destinations = self.driver.find_elements(by=By.XPATH, value='//select[@name="regions"]/option')  
+        for destination in destinations:
+            destination_index = destination.get_attribute('value')
+            destination_name = destination.text
+            if destination_index:
+                try:
+                    url = self.url + '?regions=' + str(destination_index)
+                    self.destinations_indices[int(destination_index)] = {'name': destination_name, 'url': url}
+                except:
+                    pass
+
+
+    def create_list_of_website_links_per_destination(self, destination_url=None, destination_value = "8"):
         """ Create a list of all links to the venues presented on the page."""
-        # search_results = self.driver.find_element(by=By.XPATH, value='//ul[@class="uk-grid uk-grid-match"]' )
+        links_per_destination = []
+        if destination_url:
+            self.open_page(destination_url)
+        else:
+            self.__specify_search(destination_value)
+        time.sleep(2)
         search_content = self.driver.find_element(by=By.XPATH, value='//div[@id="search-results-list"]')
         ul_tag = search_content.find_element(by=By.XPATH, value='./ul' )
         search_venues = ul_tag.find_elements(by=By.XPATH, value='./li')
@@ -74,7 +103,19 @@ class Scraper:
         for venue in search_venues:
             time.sleep(1)
             a_tag = venue.find_element(by=By.XPATH, value='.//a[@class="major-link"]' )
-            self.links.append(a_tag.get_attribute("href"))
+            links_per_destination.append(a_tag.get_attribute("href"))
+
+        return links_per_destination
+
+    def create_list_of_website_links_all_destinations(self):
+        for prop_dict in self.destinations_indices.values():
+            try:
+                extracted_links_per_destination = self.create_list_of_website_links_per_destination(prop_dict['url'])
+                self.links.extend(extracted_links_per_destination)
+                print(f"Properties links found for destination {prop_dict['name']}")
+            except:
+                print(f"No proprties links found for destination {prop_dict['name']}")
+
 
     def get_loc_capacity_price_name(self):
         """ Scrap an individual page for a name, location, number of guests, capacity, price."""
@@ -85,7 +126,6 @@ class Scraper:
         venue_items = venue_items_div.find_elements(by=By.XPATH, value='./div')
         items_dict_extend={"location": None, "guests": None, 'sleeps': None, 'from': None }
         for i, item in enumerate(venue_items):
-            # print(item.text)
             try:
                 items_dict_extend[list(items_dict_extend.keys())[i]] = item.text
             except:
@@ -173,13 +213,27 @@ class Scraper:
         """ Runs the entire website scrapping."""
         self.open_page(self.url)
         self.accept_cookies()
-        self.specify_search()
-        self.create_list_of_website_links()
+        self.get_all_destinations_urls()
+        self.create_list_of_website_links_all_destinations()
         self.extract_data()
+        self.driver.quit()
           
 if __name__ == "__main__":
     wedding = Scraper("https://www.frenchweddingvenues.com/french-wedding-venues")
     wedding.main_run()
+    # wedding.get_all_destinations_urls()
+    # wedding.create_list_of_website_links_all_destinations()
+    
+    # wedding.create_list_of_website_links_all_destinations()
+
+    # wedding.create_list_of_website_links_per_destination("https://www.frenchweddingvenues.com/french-wedding-venues?regions=3")
+    # wedding.open_page("https://www.frenchweddingvenues.com/french-wedding-venues?regions=3")
+    # print(type(wedding.destinations_indices[3]['url']))
+    # wedding.open_page(wedding.destinations_indices[3]['url'])
     
 
 
+
+    # %%
+int("3")
+# %%
