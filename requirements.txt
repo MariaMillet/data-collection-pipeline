@@ -1,0 +1,12 @@
+brotlipy==0.7.0
+certifi 
+cffi
+cryptography
+idna
+pycparser
+pyOpenSSL
+PySocks
+selenium
+urllib3
+uuid==1.30
+requests

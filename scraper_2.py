@@ -31,6 +31,14 @@ class Scraper:
         self.url = url
         options = Options()
         options.headless = True
+        options.add_argument("--disable-gpu")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-infobars")
+        options.add_argument("--start-maximized")
+        options.add_argument("--disable-notifications")
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')  
         self.driver = webdriver.Chrome(options=options) 
         self.links_venues = []
         self.links_to_destinations = []
