@@ -1,0 +1,10 @@
+services:
+  scrapper:
+    image: venues:latest
+    volumes:
+      - type: bind
+        source: ./data_from_container
+        target: /raw_data
+
+volumes:
+  scrapped_data:
