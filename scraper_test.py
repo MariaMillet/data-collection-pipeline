@@ -1,5 +1,5 @@
 #%%
-import scraper_2 as chrome_scraper
+import scraper as chrome_scraper
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By

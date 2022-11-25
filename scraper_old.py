@@ -12,7 +12,7 @@ class Scraper:
     def __init__(self, url):
         self.url = url
         self.driver = webdriver.Chrome() 
-        self.driver.get(URL)
+        self.driver.get(self.url)
         time.sleep(5)
 
     

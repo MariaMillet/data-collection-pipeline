@@ -86,7 +86,7 @@ class Scraper:
     def get_all_destinations_urls(self):
         """ Extracts names and indices values of elements corresponding to regions.
 
-        Populates destination_indices with integer index values as keys and a name and a url as values. 
+        Populates destinations_indices with integer index values as keys and a name and a url as values. 
 
         """
         
@@ -263,19 +263,9 @@ class Scraper:
 if __name__ == "__main__":
     wedding = Scraper("https://www.frenchweddingvenues.com/french-wedding-venues")
     wedding.main_run()
-    # wedding.get_all_destinations_urls()
-    # wedding.create_list_of_website_links_all_destinations()
-    
-    # wedding.create_list_of_website_links_all_destinations()
-
-    # wedding.create_list_of_website_links_per_destination("https://www.frenchweddingvenues.com/french-wedding-venues?regions=3")
-    # wedding.open_page("https://www.frenchweddingvenues.com/french-wedding-venues?regions=3")
-    # print(type(wedding.destinations_indices[3]['url']))
-    # wedding.open_page(wedding.destinations_indices[3]['url'])
     
 
 
 
-    # %%
-int("3")
+
 # %%

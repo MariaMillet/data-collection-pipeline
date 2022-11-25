@@ -1,7 +1,17 @@
 # Data Collection Pipeline
-This scraper is intended to collect data from a wedding venues website "https://www.frenchweddingvenues.com/french-wedding-venues". The scraper file is `scraper_2.py`.
+This scraper is intended to collect data from a wedding venues' website [French wedding venues](https://www.frenchweddingvenues.com/french-wedding-venues). The scraper file is `scraper.py`. Originally it was planned to scrap a different website [Chateau selection](https://chateaubeeselection.com) however upon inspecting there were not too many venues available, so the website was changed. 
 
-## 
+## Retrieving the data
+All of the relevant data for each featured venue was scraped through the following implemented methods:
+* Regions' names,indices values and urls are extracted using `get_all_destinations_urls`. Results are stored in the `destinations_indices` attribute, which is a dictionary with a key = region's index and values = a dictionary of a region's name and a region's url.
+* The results extracted from running method above are used to loop through each regions' url and extract links to the venues located in the region. This is implemented in a method `create_list_of_website_links_all_destinations` using a separately-defined method `create_list_of_website_links_per_destination`. The later extracts links to venues present on the regions page. 
+* Once all links to all venues are extracted a few methods were written to scap the data from individual venues pages. The extraction of the data is done by navigating to the relevant paths:
+    * location / price / capacity `get_loc_capacity_price_name`
+    * description `get_description`
+    * additional features `get_additional_info`
+    * images links `get images`
+* `extract_data` method loops through all of the venues in the `links_venues` attribute and extracts information about the venue using above mentioned methods. The data is extracted into a 'raw_data' folder in a json format. Static methods were used to create a folder and convert dictionary data into a json file.
+* Lastly, `accept_cookies` method was implemented however submitting cookies preferences is not essential to navigate through the pages of the website.
 
 
 ## Unit Testing
