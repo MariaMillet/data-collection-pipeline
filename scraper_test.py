@@ -47,17 +47,17 @@ class TestChromeScraperExtractingInfo(unittest.TestCase):
         test_venue_url = links[0]
         self.venues_scraper.open_page(test_venue_url)
     
-    def test_get_loc_capacity_price_name(self):
-        result = self.venues_scraper.get_loc_capacity_price_name()
-        self.assertIsInstance(result, dict)
-        print('get_loc_capacity_price_name returns a dictionary')
+    # def test_get_loc_capacity_price_name(self):
+    #     result = self.venues_scraper.get_loc_capacity_price_name()
+    #     self.assertIsInstance(result, dict)
+    #     print('get_loc_capacity_price_name returns a dictionary')
 
     def test_get_loc_capacity_price_name(self):
         result = self.venues_scraper.get_loc_capacity_price_name()
   
         non_empty_values = all(bool(result) for result in list(result.values()))
-        self.assertTrue(non_empty_values)
-        print('The driver extracts information about the location/capacity/price/name')
+        self.assertTrue(non_empty_values, isinstance(result, dict))
+        print('The driver extracts information about the location/capacity/price/name in a dictionary.')
 
     def test_get_description(self):
         result = self.venues_scraper.get_description()
